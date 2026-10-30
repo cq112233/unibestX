@@ -98,18 +98,48 @@ type GuardVerdict = {
   time: number;
 };
 
+/** 一次守卫裁决的完整结果：调用方既要知道是否放行，也要拿到补齐后的目标路由 */
+type GuardDecision = {
+  allowed: boolean;
+  target: RouteTarget;
+};
+
 let switchTabGuardVerdict: GuardVerdict | null = null;
 let navigateBackGuardVerdict: GuardVerdict | null = null;
+
+/** H5 popstate 是同一次返回的补充事件，去重口径必须与 navigateBack 保持一致 */
+function normalizeGuardDedupeApi(api: string): string {
+  return api == 'popstate' ? 'navigateBack' : api;
+}
+
+/** 构造去重键：包含归一化 API、路径与完整 query，路径相同不代表路由相同 */
+function buildGuardTargetKey(target: string, api: string): string {
+  const urlObj = parseUrlToObj(target);
+  let targetQuery = urlObj.query;
+  if ((api == 'switchTab' || api == 'navigateBack') && targetQuery.size == 0) {
+    const savedQuery = getSavedRouteQuery(urlObj.path);
+    if (savedQuery != null) {
+      targetQuery = savedQuery;
+    }
+  }
+  const parts: Array<string> = [];
+  parts.push(normalizeGuardDedupeApi(api));
+  parts.push(cleanPath(urlObj.path));
+  targetQuery.forEach((value: string, key: string): void => {
+    parts.push(`${key}=${value}`);
+  });
+  return parts.join('|');
+}
 
 /**
  * 读取窗口内同一目标的裁决结果
  * @returns 命中时返回缓存裁决；未命中或已过期返回 null
  */
-function readGuardVerdict(verdict: GuardVerdict | null, target: string, windowMs: number): GuardVerdict | null {
+function readGuardVerdict(verdict: GuardVerdict | null, target: string, windowMs: number, api: string): GuardVerdict | null {
   if (verdict == null) {
     return null;
   }
-  if (!isSamePath(verdict.target, target)) {
+  if (verdict.target != buildGuardTargetKey(target, api)) {
     return null;
   }
   if ((Date.now() - verdict.time) >= windowMs) {
@@ -119,9 +149,9 @@ function readGuardVerdict(verdict: GuardVerdict | null, target: string, windowMs
 }
 
 /** 构造一条守卫裁决缓存 */
-function createGuardVerdict(target: string, allowed: boolean): GuardVerdict {
+function createGuardVerdict(target: string, allowed: boolean, api: string): GuardVerdict {
   return {
-    target: cleanPath(target),
+    target: buildGuardTargetKey(target, api),
     allowed,
     time: Date.now()
   } as GuardVerdict;
@@ -155,19 +185,19 @@ export function allowNavigation(url: string, api: string): boolean {
     return true;
   }
   if (api == 'switchTab') {
-    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, cleanPath(resolvedUrl), ROUTE_GUARD_DEDUPE_WINDOW);
+    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, resolvedUrl, ROUTE_GUARD_DEDUPE_WINDOW, api);
     if (cachedVerdict != null) {
       return cachedVerdict.allowed;
     }
   }
-  const allowed = doIntercept(resolvedUrl, api);
+  const decision = doIntercept(resolvedUrl, api);
   if (api == 'switchTab') {
-    switchTabGuardVerdict = createGuardVerdict(resolvedUrl, allowed);
+    switchTabGuardVerdict = createGuardVerdict(resolvedUrl, decision.allowed, api);
   }
-  if (allowed) {
-    markTargetRoute(resolvedUrl);
+  if (decision.allowed) {
+    markTargetRoute(buildEncodedRouteUrl(decision.target.path, decision.target.query));
   }
-  return allowed;
+  return decision.allowed;
 }
 
 // #ifndef APP
@@ -194,6 +224,63 @@ function joinQueryString(query: Map<string, string>): string {
     paramsList.push(`${key}=${val}`);
   });
   return paramsList.join('&');
+}
+
+/** 构造写入路由状态的完整 URL（query 值重新编码，保持 routeState.fullPath 的既定口径） */
+function buildEncodedRouteUrl(path: string, query: Map<string, string>): string {
+  if (query.size == 0) {
+    return path;
+  }
+  const parts: Array<string> = [];
+  query.forEach((value: string, key: string): void => {
+    parts.push(`${key}=${encodeURIComponent(value)}`);
+  });
+  return `${path}?${parts.join('&')}`;
+}
+
+/**
+ * 从已归一化 URL 构造本次导航的最终目标（含小程序 Tab / 返回场景补回的 query）
+ *
+ * 守卫裁决、去重缓存与路由状态预写必须共用这一份结果，否则会出现
+ * 「守卫按空参数放行、状态却写回旧参数」这类检查与落地不一致的问题。
+ */
+function buildRouteTargetFromResolvedUrl(resolvedUrl: string, api: string): RouteTarget {
+  const urlObj = parseUrlToObj(resolvedUrl);
+  let targetQuery = urlObj.query;
+  // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
+  // 仅在切 Tab 或返回 Tab 页时回填最近一次保存的 query，避免普通导航误用旧参数。
+  if ((api == 'switchTab' || api == 'navigateBack') && targetQuery.size == 0) {
+    const savedQuery = getSavedRouteQuery(urlObj.path);
+    if (savedQuery != null && savedQuery.size > 0) {
+      targetQuery = savedQuery;
+    }
+  }
+
+  // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
+  // 守卫拿它去 encodeURIComponent 时正好只编码一次
+  const queryStr = joinQueryString(targetQuery);
+  let fullPath = urlObj.path;
+  if (queryStr != '') {
+    fullPath += `?${queryStr}`;
+  }
+
+  const meta = getRouteMeta(urlObj.path);
+  let routeName: string | null = null;
+  if (meta != null) {
+    routeName = readMetaString(meta, 'name');
+  }
+  if (routeName == null || routeName == '') {
+    routeName = getDefaultRouteName(urlObj.path);
+  }
+
+  return {
+    path: urlObj.path,
+    query: targetQuery,
+    fullPath,
+    params: targetQuery,
+    meta,
+    name: routeName
+  } as RouteTarget;
 }
 
 /**
@@ -462,49 +549,12 @@ let lastNavigatingFrom: RouteTarget = createEmptyRouteTarget();
  * @param api 触发本次跳转的 uni API 名，透传给守卫（守卫可按 API 差异化裁决）
  * @param fromOverride 来源路由显式覆盖项（可选，供支付宝等在路由完成事件中捕获的旧状态传入）
  */
-function doIntercept(url: string, api: string, fromOverride: RouteTarget | null = null): boolean {
+function doIntercept(url: string, api: string, fromOverride: RouteTarget | null = null): GuardDecision {
   if (url == null || url == '') {
-    return true;
+    return { allowed: true, target: createEmptyRouteTarget() } as GuardDecision;
   }
   const resolvedUrl = resolveNavigationUrl(url, api);
-  const urlObj = parseUrlToObj(resolvedUrl);
-  let targetQuery = urlObj.query;
-  // 小程序 switchTab 不支持 query，Tab 页的 page.options 会为空。
-  // 仅在切 Tab 或返回 Tab 页时回填最近一次保存的 query，避免普通导航误用旧参数。
-  if ((api == 'switchTab' || api == 'navigateBack') && targetQuery.size == 0) {
-    const savedQuery = getSavedRouteQuery(urlObj.path);
-    if (savedQuery != null && savedQuery.size > 0) {
-      targetQuery = savedQuery;
-    }
-  }
-
-  // fullPath 由 path + 解码后的 query 重拼（而不是直接用 resolvedUrl）：保持「解码态」口径，
-  // 守卫拿它去 encodeURIComponent 时正好只编码一次
-  const queryStr = joinQueryString(targetQuery);
-  let fullPath = urlObj.path;
-  if (queryStr != '') {
-    fullPath += `?${queryStr}`;
-  }
-
-  const meta = getRouteMeta(urlObj.path);
-  let routeName: string | null = null;
-  if (meta != null) {
-    routeName = readMetaString(meta, 'name');
-  }
-  if (routeName == null || routeName == '') {
-    routeName = getDefaultRouteName(urlObj.path);
-  }
-
-  // 对象字面量按仓库既有先例写成「类型化变量 + as」（如 tabbar 的 buildFullTabbarList）：
-  // 嵌套字面量直传给 type 字段没有先例，Kotlin 侧推断不可靠，这里显式落到具体类型上
-  const target: RouteTarget = {
-    path: urlObj.path,
-    query: targetQuery,
-    fullPath,
-    params: targetQuery,
-    meta,
-    name: routeName
-  } as RouteTarget;
+  const target = buildRouteTargetFromResolvedUrl(resolvedUrl, api);
 
   // 获取当前来源页面路由（from）：若显式传入（如支付宝原生返回补丁），优先采用；否则由全局状态解析
   let fromTarget: RouteTarget = (fromOverride != null && fromOverride.path != '')
@@ -536,10 +586,10 @@ function doIntercept(url: string, api: string, fromOverride: RouteTarget | null 
   if (decision.pass) {
     redirectDepth = 0;
     runAfterEachHooks(target, fromTarget, null);
-    return true;
+    return { allowed: true, target } as GuardDecision;
   }
   dispatchRedirect(decision.redirect, decision.replace == true);
-  return false;
+  return { allowed: false, target } as GuardDecision;
 }
 
 /**
@@ -636,16 +686,17 @@ export const reLaunchInterceptor: Interceptor = {
 };
 
 /** 原生 TabBar 切换的统一守卫入口（onBeforeAppRoute / onAppRoute / onTabItemTap 共用） */
-function runNativeTabSwitchGuard(targetPath: string): boolean {
+function runNativeTabSwitchGuard(targetPath: string): GuardDecision {
   const target = cleanPath(targetPath);
   if (target == '') {
-    return true;
+    return { allowed: true, target: createEmptyRouteTarget() } as GuardDecision;
   }
 
   // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
-  const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, target, ROUTE_GUARD_DEDUPE_WINDOW);
+  const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, target, ROUTE_GUARD_DEDUPE_WINDOW, 'switchTab');
   if (cachedVerdict != null) {
-    return cachedVerdict.allowed;
+    const cachedTarget = buildRouteTargetFromResolvedUrl(resolveNavigationUrl(target, 'switchTab'), 'switchTab');
+    return { allowed: cachedVerdict.allowed, target: cachedTarget } as GuardDecision;
   }
 
   let fromTarget: RouteTarget | null = null;
@@ -670,9 +721,9 @@ function runNativeTabSwitchGuard(targetPath: string): boolean {
     } as RouteTarget;
   }
 
-  const allowed = doIntercept(target, 'switchTab', fromTarget);
-  switchTabGuardVerdict = createGuardVerdict(target, allowed);
-  return allowed;
+  const decision = doIntercept(target, 'switchTab', fromTarget);
+  switchTabGuardVerdict = createGuardVerdict(target, decision.allowed, 'switchTab');
+  return decision;
 }
 
 /**
@@ -687,14 +738,14 @@ function runNativeTabSwitchGuard(targetPath: string): boolean {
  */
 export function interceptNativeTabSwitch(targetPath: string): boolean {
   const target = cleanPath(targetPath);
-  const allowed = runNativeTabSwitchGuard(target);
-  if (allowed) {
+  const decision = runNativeTabSwitchGuard(target);
+  if (decision.allowed) {
     // 开发者工具里没有 onAppRoute 兜底刷新，守卫放行后主动落地目标路由
-    if (target != '') {
-      applyRouteFromUrl(target);
+    if (decision.target.path != '') {
+      applyRouteFromUrl(buildEncodedRouteUrl(decision.target.path, decision.target.query));
     }
   }
-  return allowed;
+  return decision.allowed;
 }
 
 /**
@@ -850,7 +901,7 @@ export function interceptNativeBack(targetPath: string = ''): boolean {
   const target = cleanPath(targetUrl);
 
   // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
-  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, target, ROUTE_GUARD_DEDUPE_WINDOW);
+  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetFullPath, ROUTE_GUARD_DEDUPE_WINDOW, 'navigateBack');
   if (cachedVerdict != null) {
     return cachedVerdict.allowed;
   }
@@ -887,13 +938,13 @@ export function interceptNativeBack(targetPath: string = ''): boolean {
     } as RouteTarget;
   }
 
-  const allowed = doIntercept(targetFullPath, 'navigateBack', fromTarget);
-  navigateBackGuardVerdict = createGuardVerdict(target, allowed);
-  if (allowed) {
+  const decision = doIntercept(targetFullPath, 'navigateBack', fromTarget);
+  navigateBackGuardVerdict = createGuardVerdict(targetFullPath, decision.allowed, 'navigateBack');
+  if (decision.allowed) {
     nativeBackGuardHandledTarget = target;
     nativeBackGuardHandledTime = Date.now();
   }
-  return allowed;
+  return decision.allowed;
 }
 
 export const switchTabInterceptor: Interceptor = {
@@ -1066,14 +1117,13 @@ export const navigateBackInterceptor: Interceptor = {
           queryStr = pairs.join('&');
         }
         const url = queryStr != '' ? `${path}?${queryStr}` : path;
-        const targetKey = cleanPath(path);
-        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetKey, ROUTE_GUARD_DEDUPE_WINDOW);
+        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, url, ROUTE_GUARD_DEDUPE_WINDOW, 'navigateBack');
         if (cachedVerdict != null) {
           markNavigateBackInterceptorVerdict(cachedVerdict.allowed);
           return cachedVerdict.allowed;
         }
         const allowed = allowNavigation(url, 'navigateBack');
-        navigateBackGuardVerdict = createGuardVerdict(targetKey, allowed);
+        navigateBackGuardVerdict = createGuardVerdict(url, allowed, 'navigateBack');
         markNavigateBackInterceptorVerdict(allowed);
         return allowed;
       }
@@ -1136,13 +1186,13 @@ function installH5PopstateListener(): void {
           targetPath = getDefaultHomePage();
         }
         // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果也不得再次派发改跳
-        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetPath, H5_POPSTATE_DEDUPE_WINDOW);
+        const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, h5Url, H5_POPSTATE_DEDUPE_WINDOW, 'popstate');
         if (cachedVerdict != null) {
           return;
         }
         // 同步执行守卫裁决并在放行时预写目标路由，确保后续挂载的目标页面 setup 中第一帧读到正确的新路由
         const allowed = allowNavigation(h5Url, 'popstate');
-        navigateBackGuardVerdict = createGuardVerdict(targetPath, allowed);
+        navigateBackGuardVerdict = createGuardVerdict(h5Url, allowed, 'popstate');
       }
     }, true);
   }
@@ -1215,7 +1265,7 @@ function installMpNavigateBackListener(): void {
       }
 
       // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果也不得再次派发改跳
-      const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, targetPath, ROUTE_GUARD_DEDUPE_WINDOW);
+      const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, url, ROUTE_GUARD_DEDUPE_WINDOW, 'navigateBack');
       if (cachedVerdict != null) {
         return;
       }
@@ -1245,8 +1295,8 @@ function installMpNavigateBackListener(): void {
         } as RouteTarget;
       }
 
-      const allowed = doIntercept(url, 'navigateBack', fromTarget);
-      navigateBackGuardVerdict = createGuardVerdict(targetPath, allowed);
+      const decision = doIntercept(url, 'navigateBack', fromTarget);
+      navigateBackGuardVerdict = createGuardVerdict(url, decision.allowed, 'navigateBack');
     }
   });
 }
@@ -1322,7 +1372,7 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   const isTargetTabbar = customTabbarHandler != null ? customTabbarHandler!.isTabbar(currentPath) : false;
   if (isTargetTabbar && !isSamePath(routeState.path, currentPath)) {
     // 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
-    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, currentPath, ROUTE_GUARD_DEDUPE_WINDOW);
+    const cachedVerdict = readGuardVerdict(switchTabGuardVerdict, toUrl, ROUTE_GUARD_DEDUPE_WINDOW, 'switchTab');
     if (cachedVerdict != null) {
       return cachedVerdict.allowed;
     }
@@ -1336,9 +1386,9 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
       name: routeState.name
     } as RouteTarget;
 
-    const allowed = doIntercept(toUrl, 'switchTab', fromTarget);
-    switchTabGuardVerdict = createGuardVerdict(currentPath, allowed);
-    if (!allowed) {
+    const decision = doIntercept(toUrl, 'switchTab', fromTarget);
+    switchTabGuardVerdict = createGuardVerdict(toUrl, decision.allowed, 'switchTab');
+    if (!decision.allowed) {
       return false;
     }
     return true;
@@ -1360,7 +1410,7 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   }
 
   // 3. 防抖去重：窗口内复用同一目标上一次裁决，拒绝结果不得被当成放行
-  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, currentPath, ROUTE_GUARD_DEDUPE_WINDOW);
+  const cachedVerdict = readGuardVerdict(navigateBackGuardVerdict, toUrl, ROUTE_GUARD_DEDUPE_WINDOW, 'navigateBack');
   if (cachedVerdict != null) {
     return cachedVerdict.allowed;
   }
@@ -1377,9 +1427,9 @@ export function checkAndInterceptPageShow(targetPath: string = ''): boolean {
   } as RouteTarget;
 
   // 执行路由守卫拦截
-  const allowed = doIntercept(toUrl, 'navigateBack', fromTarget);
-  navigateBackGuardVerdict = createGuardVerdict(currentPath, allowed);
-  if (!allowed) {
+  const decision = doIntercept(toUrl, 'navigateBack', fromTarget);
+  navigateBackGuardVerdict = createGuardVerdict(toUrl, decision.allowed, 'navigateBack');
+  if (!decision.allowed) {
     return false;
   }
 
@@ -1549,8 +1599,8 @@ export function checkDirectEntry(options: any | null = null) {
   }
 
   // 执行路由守卫裁决（'appLaunch' 语义）
-  const allowed = doIntercept(url, 'appLaunch');
-  if (allowed) {
-    markTargetRoute(url);
+  const decision = doIntercept(url, 'appLaunch');
+  if (decision.allowed) {
+    markTargetRoute(buildEncodedRouteUrl(decision.target.path, decision.target.query));
   }
 }

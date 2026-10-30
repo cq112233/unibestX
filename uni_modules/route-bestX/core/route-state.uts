@@ -551,16 +551,15 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   if (normalizedPath == '') {
     return;
   }
-  let finalQuery = query;
-  let finalFullPath = fullPath;
-  if (finalQuery.size > 0) {
-    saveRouteQuery(normalizedPath, finalQuery);
-  } else {
-    const saved = getSavedRouteQuery(normalizedPath);
-    if (saved != null && saved.size > 0) {
-      finalQuery = saved;
-      finalFullPath = buildFullPath(normalizedPath, saved);
-    }
+  // query 是本次提交的唯一真值：空 query 就是空 query，不能按路径回填旧值。
+  // 小程序 Tab / 返回场景需要的参数补回必须在**守卫前**由调用方显式完成，
+  // 否则会出现「守卫按空参数检查、落状态时却恢复旧参数」的检查/落地不一致。
+  if (query.size > 0) {
+    saveRouteQuery(normalizedPath, query);
+  }
+  else if (!includeClaimed) {
+    // 新的导航请求明确没有参数：同步清掉该路径上一次的暂存，避免后续 switchTab / 返回误用。
+    clearRouteQuery(normalizedPath);
   }
   // 在全局 routeState 被改写前，若原路径非空且与新路径不同，暂存为上一个路由快照
   if (routeState.path != '' && !isSamePath(routeState.path, normalizedPath)) {
@@ -601,9 +600,9 @@ function commitRoute(path: string, query: Map<string, string>, fullPath: string,
   }
   const meta = getRouteMeta(normalizedPath);
   routeState.path = normalizedPath;
-  routeState.fullPath = finalFullPath;
-  routeState.query = finalQuery;
-  routeState.params = finalQuery;
+  routeState.fullPath = fullPath;
+  routeState.query = query;
+  routeState.params = query;
   routeState.meta = meta;
   let routeName: string | null = null;
   if (meta != null) {
@@ -778,7 +777,15 @@ function handleAppRoute(event: AppRouteEvent): void {
     return;
   }
   const normalizedPath = cleanPath(rawPath);
-  const query = queryMapFromObject(event.query);
+  let query = queryMapFromObject(event.query);
+  // Android / 微信的 switchTab 不携带 query，路由完成事件里的 query 会是空对象。
+  // 这类事件不能覆盖导航发起方刚暂存的目标参数；普通 navigateTo 仍以本次空 query 为准。
+  if (query.size == 0 && (event.openType == 'switchTab' || event.openType == 'navigateBack' || event.openType == 'pageBack')) {
+    const savedQuery = getSavedRouteQuery(normalizedPath);
+    if (savedQuery != null && savedQuery.size > 0) {
+      query = savedQuery;
+    }
+  }
   commitRoute(normalizedPath, query, buildFullPath(normalizedPath, query), true);
 }
 
