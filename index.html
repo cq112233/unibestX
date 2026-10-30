@@ -14,19 +14,7 @@
       );
     </script>
     <title></title>
-    <style>
-      /* 只移除 H5 原生 TabBar 默认生成的 ::after 50px 伪元素占位，消除双重空白 */
-      /* ⚠️ 禁止隐藏 .uni-async-loading / .uni-loading：
-         .uni-async-loading 是页面异步组件的官方加载态（就是那颗转圈菊花），
-         .uni-loading 同时被 uni.showLoading 使用。
-         隐藏后弱网首屏、切 Tab、切页都会变成无任何反馈的白屏。 */
-      uni-page-body::after,
-      uni-app.uni-app--showtabbar uni-page-body::after {
-        display: none !important;
-        height: 0px !important;
-        min-height: 0px !important;
-      }
-    </style>
+    <style></style>
     <!--preload-links-->
     <!--app-context-->
   </head>
