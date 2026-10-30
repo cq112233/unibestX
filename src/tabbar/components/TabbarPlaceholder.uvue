@@ -1,12 +1,3 @@
-<template>
-  <!-- 底部 TabBar 统一自适应垫高占位组件：根据 VITE_TABBAR_MODE、TabBar 风格形态及机型屏幕安全区动态垫高 -->
-  <view
-    v-if="shouldRender"
-    class="tabbar-placeholder-box"
-    :style="{ height: `${tabbarBottomPaddingHeight}px` }"
-  />
-</template>
-
 <script setup lang="uts">
 import { computed } from 'vue';
 import { useTabbar, useTabbarMetrics } from '@/src/tabbar/index.uts';
@@ -16,19 +7,48 @@ const props = defineProps({
   isTabbarPage: {
     type: Boolean,
     default: true
+  },
+  /**
+   * 当前占位所属的 Tab 下标（模式 4 由 TabContent 传入，模式 2 / 3 由 navbar 传入 curIdx）
+   *
+   * 用于读取对应 Tab 配置项（含 midButton）的 isFill，未传时回退到当前 curIdx。
+   */
+  tabIndex: {
+    type: Number,
+    default: -1
   }
 });
 
 /** 当前 TabBar 模式是否需要页面底部预留空间 */
-const { needTabbarBottomPadding } = useTabbar();
+const { curIdx, needTabbarBottomPadding, tabbarList, tabbarType } = useTabbar();
 /** 根据 TabBar 形态和安全区计算实际预留高度 */
 const { tabbarBottomPaddingHeight } = useTabbarMetrics();
 
 /** 是否满足渲染垫高占位块的条件 */
 const shouldRender = computed((): boolean => {
-  return props.isTabbarPage && needTabbarBottomPadding && tabbarBottomPaddingHeight.value > 0;
+  if (!props.isTabbarPage || !needTabbarBottomPadding || tabbarBottomPaddingHeight.value <= 0) {
+    return false;
+  }
+  // isFill 只在悬浮胶囊形态生效：对应 Tab 铺满到底部时不渲染垫高占位
+  if (tabbarType == 'capsule') {
+    const index = props.tabIndex >= 0 ? props.tabIndex : curIdx.value;
+    if (index >= 0 && index < tabbarList.length) {
+      const item = tabbarList[index];
+      return item.isFill != true;
+    }
+  }
+  return true;
 });
 </script>
+
+<template>
+  <!-- 底部 TabBar 统一自适应垫高占位组件：根据 VITE_TABBAR_MODE、TabBar 风格形态及机型屏幕安全区动态垫高 -->
+  <view
+    v-if="shouldRender"
+    class="tabbar-placeholder-box"
+    :style="{ height: `${tabbarBottomPaddingHeight}px` }"
+  />
+</template>
 
 <style lang="scss" scoped>
 .tabbar-placeholder-box {

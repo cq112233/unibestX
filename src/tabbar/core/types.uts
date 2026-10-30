@@ -33,6 +33,13 @@ export type CustomTabBarItem = {
   badge: CustomTabBarItemBadge | null;
   /** 是否是中间鼓包 tabbarItem */
   isBulge: boolean;
+  /**
+   * 当前 Tab 是否铺满到底部（隐藏 tabbar-placeholder-box）
+   *
+   * 仅 `customTabbarConfig.type === 'capsule'` 时生效，默认 false。
+   * 配置在 list 的当前项或 midButton 上即可，只影响对应 Tab，不会影响其它 Tab。
+   */
+  isFill?: boolean;
 };
 
 /** midButton 的 iconfont 字体图标配置 */
@@ -83,6 +90,8 @@ export type TabBarMidButton = {
   badge?: CustomTabBarItemBadge | null;
   /** 是否是鼓包按钮 */
   isBulge?: boolean;
+  /** 当前 Tab 是否铺满到底部（隐藏 tabbar-placeholder-box，仅 capsule 形态生效，默认 false） */
+  isFill?: boolean;
 };
 
 /** Tabbar 完整对象配置（完全对齐 uni-app 原生 pages.json tabBar 配置项规范） */

@@ -109,9 +109,12 @@ src/tabbar/
      iconPath: 'static/tabbar/people.png',       // iconType 为 'image' 时用这两个
      selectedIconPath: 'static/tabbar/people_fill.png',
      badge: null,                                // number | 'dot' | null
-     isBulge: false
+     isBulge: false,
+     isFill: false                               // true：该 Tab 铺满到底部，隐藏 tabbar-placeholder-box
    }
    ```
+
+> 💡 **`isFill` 只在 `type: 'capsule'` 时生效**，默认 `false`。它是逐 Tab 配置：哪个 Tab 设为 `true`，就只有那个 Tab 不渲染底部占位；模式 2 / 3 / 4 均适用。`midButton` 同样支持该字段。
 
 2. 保存。插件会先检查 `pagePath` 对应的 `.uvue` 是否存在：缺失时按内置模板自动补建，随后重新生成 [components/TabViews.uvue](components/TabViews.uvue)。页面名取自 `pagePath` 最后一段，`tabType` 会自动写入 `useTabPageShell()` 与下拉刷新门控。
 3. 直接在页面 `.uvue` 里写业务内容。模式 4 下同一个文件既是真实页面，也是 Tab 子组件，不再维护 `views/*View.uvue`。
@@ -126,6 +129,8 @@ src/tabbar/
 `config.uts` 里那段 `midButton` 默认是**注释掉的**——解开注释即启用，插件会自动把它按居中位置插进列表并直接挂载对应页面；再注释掉即停用。
 
 **插件的注释处理**：解析前会剥掉 `//` 行注释与 `/* */` 块注释，所以**用注释来启停 `midButton` 是官方支持的写法**，不会污染生成的代码。
+
+`midButton` 也支持 `isFill`：设为 `true` 后，该中间 Tab 页面在 `capsule` 形态下同样会隐藏 `tabbar-placeholder-box`。
 
 > ⚠️ **`midButton` 的跨端限制**（官方原生底层能力）：
 >

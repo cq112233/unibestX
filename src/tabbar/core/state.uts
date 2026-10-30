@@ -20,7 +20,8 @@ function buildFullTabbarList(config: TabBarConfig): CustomTabBarItem[] {
       iconPath: mid.iconPath ?? '',
       selectedIconPath: mid.selectedIconPath ?? '',
       badge: mid.badge ?? null,
-      isBulge: mid.isBulge ?? true
+      isBulge: mid.isBulge ?? true,
+      isFill: mid.isFill ?? false
     };
     const half = Math.floor(list.length / 2);
     for (let i = 0; i < list.length; i++) {
@@ -63,7 +64,8 @@ function normalizeList(): CustomTabBarItem[] {
       iconPath: item.iconPath,
       selectedIconPath: item.selectedIconPath,
       badge: item.badge,
-      isBulge: item.isBulge
+      isBulge: item.isBulge,
+      isFill: item.isFill ?? false
     });
   }
   return result;

@@ -140,21 +140,12 @@ export default defineManifestConfig({
       mode: 'hash',
       base: './'
     },
-    darkmode: true,
-    async: {
-      loading: '',
-      delay: 999999
-    }
+    darkmode: true
   },
   'h5': {
     router: {
       mode: 'hash',
       base: './'
-    },
-    darkmode: true,
-    async: {
-      loading: '',
-      delay: 999999
     }
   },
 
